@@ -24,9 +24,6 @@ function Navbar1() {
 
 
             </NavDropdown>
-            <NavDropdown title="Gauss" id="basic-nav-dropdown">
-              <NavDropdown.Item href="/Cramer">Cramer</NavDropdown.Item>
-            </NavDropdown>
           </Nav>
         </Navbar.Collapse>
       </Container>

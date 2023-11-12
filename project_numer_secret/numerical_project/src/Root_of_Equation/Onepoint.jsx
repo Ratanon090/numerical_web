@@ -1,18 +1,36 @@
-import { useState } from "react"
-import { Button, Container, Form, FormText, Table } from "react-bootstrap";
-import { evaluate } from 'mathjs'
+import React, { Component } from "react";
+import { Button, Container, Form, Table } from "react-bootstrap";
+import { evaluate } from 'mathjs';
 import Card from 'react-bootstrap/Card';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
-<h1>
-    One-Gay-Down
-</h1>
-const Onepoint = () =>{
-    const print = () =>{
-        console.log(data)
-        setValueIter(data.map((x) => x.iteration));
-        setValueXl(data.map((x) =>x.Xl));
-        return(
+
+class Onepoint extends Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            valueIter: [],
+            valueXl: [],
+            valueXr: [],
+            html: null,
+            Equation: "(x+1)/44",
+            X: 0,
+            XL: 0,
+            XR: 0,
+        };
+
+        this.data = [];
+    }
+
+    print = () => {
+        console.log(this.data);
+        this.setState({
+            valueIter: this.data.map((x) => x.iteration),
+            valueXl: this.data.map((x) => x.XL),
+        });
+
+        return (
             <Container>
                 <Table striped bordered hover variant="dark">
                     <thead>
@@ -22,22 +40,24 @@ const Onepoint = () =>{
                         </tr>
                     </thead>
                     <tbody>
-                        {data.map((element, index)=>{
-                            return(
-                                <tr key = {index}>
+                        {this.data.map((element, index) => {
+                            return (
+                                <tr key={index}>
                                     <td>{element.iteration}</td>
                                     <td>{element.XL}</td>
                                 </tr>
-                            )
+                            );
                         })}
                     </tbody>
                 </Table>
             </Container>
-        )
-    }
-    const error = (xold,xnew) => Math.abs(xnew - xold / xnew)*100;
-    const calPoint = (xl)=>{
-        var xnew,scope,fXl;
+        );
+    };
+
+    error = (xold, xnew) => Math.abs(xnew - xold / xnew) * 100;
+
+    calPoint = (xl) => {
+        var xnew, scope, fXl;
         const e = 0.000001;
         var iter = 0;
         var temp;
@@ -45,89 +65,101 @@ const Onepoint = () =>{
         var obj = {};
         const MAX = 50;
         scope = {
-            x:xl,
-        }
-        xnew = evaluate(Equation, scope);
-        while((Math.abs(xnew - xl)/xnew)* 100 > e && iter < MAX){
+            x: xl,
+        };
+        xnew = evaluate(this.state.Equation, scope);
+        while ((Math.abs(xnew - xl) / xnew) * 100 > e && iter < MAX) {
             xl = xnew;
             iter++;
             scope = {
-                x:xl,
-            }
-            xnew = evaluate(Equation, scope);
+                x: xl,
+            };
+            xnew = evaluate(this.state.Equation, scope);
             obj = {
                 iteration: iter,
                 XL: xnew,
-            }
-            data.push(obj)
+            };
+            this.data.push(obj);
         }
-        setX(xnew)
+        this.setState({ X: xnew });
+    };
 
-    }
-    const data = [];
-    const [valueIter, setValueIter] = useState([]);
-    const [valueXl, setValueXl] = useState([]);
-    const [valueXr, setValueXr] = useState([]);
+    inputEquation = (event) => {
+        console.log(event.target.value);
+        this.setState({ Equation: event.target.value });
+    };
 
-    const [html, setHtml] = useState(null);
-    const [Equation, setEquation] = useState("(x+1)/44");
-    const [X, setX] = useState(0)
-    const [XL, setXL] = useState(0)
-    const [XR,setXR] = useState(0)
+    inputXL = (event) => {
+        console.log(event.target.value);
+        this.setState({ XL: event.target.value });
+    };
 
-    const inputEquation = (event) =>{
-        console.log(event.target.value)
-        setEquation(event.target.value)
-    }
-    const inputXL = (event) =>{
-        console.log(event.target.value)
-        setXL(event.target.value)
-    }
-    const inputXR = (event) =>{
-        console.log(event.target.value)
-        setXR(event.target.value)
-    }
-    const calculateRoot = () =>{
-        const xlnum = parseFloat(XL)
-        const xrnum = parseFloat(XR)
-        calPoint(xlnum,xrnum);
+    inputXR = (event) => {
+        console.log(event.target.value);
+        this.setState({ XR: event.target.value });
+    };
 
-        setHtml(print());
+    calculateRoot = () => {
+        const xlnum = parseFloat(this.state.XL);
+        const xrnum = parseFloat(this.state.XR);
+        this.calPoint(xlnum, xrnum);
 
-        console.log(valueIter)
-        console.log(valueXl)
-    }
-    return(
-        <Container style ={{width: "40%"}}>
-            <h1>One-Point-Iteration</h1>
-            <Card>
-                <Card.Header as="h5">GAY SHIT</Card.Header>
-                <Card.Body>
-                    <Row>
-                        <Form.Label>Input f(x)</Form.Label>
-                        <input type = "text" id="equation" value={Equation} onChange={inputEquation} style={{width: "80%", margin: "0 auto"}} className="form-control"></input>
-                    </Row>
-                    <Row>
-                        <Col>
-                            <Form.Label> Input XL</Form.Label>
-                            <input type = "number" id="XL" onChange = {inputXL} className = "form-control" style={{width: "85%", margin: "0 auto"}}></input>
-                        </Col>
-                        
-                    </Row>
-                    <Row>
-                        <br></br>
-                    </Row>
-                    <Row>
-                        <Button varaint = "primary" onClick={calculateRoot} style={{width: "20%", margin: "0 auto"}}>Calculate</Button>
-                    </Row>
-                </Card.Body>
-                <h5> Answer = {X.toPrecision(10)}</h5>
-            </Card>
-            <br></br>
-            <Container>
-                {html}
+        this.setState({ html: this.print() });
+
+        console.log(this.state.valueIter);
+        console.log(this.state.valueXl);
+    };
+
+    render() {
+        return (
+            <Container style={{ width: "40%" }}>
+                <h1>One-Point-Iteration</h1>
+                <Card>
+                    <Card.Header as="h5">GAY SHIT</Card.Header>
+                    <Card.Body>
+                        <Row>
+                            <Form.Label>Input f(x)</Form.Label>
+                            <input
+                                type="text"
+                                id="equation"
+                                value={this.state.Equation}
+                                onChange={this.inputEquation}
+                                style={{ width: "80%", margin: "0 auto" }}
+                                className="form-control"
+                            ></input>
+                        </Row>
+                        <Row>
+                            <Col>
+                                <Form.Label> Input XL</Form.Label>
+                                <input
+                                    type="number"
+                                    id="XL"
+                                    onChange={this.inputXL}
+                                    className="form-control"
+                                    style={{ width: "85%", margin: "0 auto" }}
+                                ></input>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <br></br>
+                        </Row>
+                        <Row>
+                            <Button
+                                varaint="primary"
+                                onClick={this.calculateRoot}
+                                style={{ width: "20%", margin: "0 auto" }}
+                            >
+                                Calculate
+                            </Button>
+                        </Row>
+                    </Card.Body>
+                    <h5> Answer = {this.state.X.toPrecision(10)}</h5>
+                </Card>
+                <br></br>
+                <Container>{this.state.html}</Container>
             </Container>
-        </Container>
-    )
+        );
+    }
 }
+
 export default Onepoint;
